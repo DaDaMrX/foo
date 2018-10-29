@@ -1,0 +1,777 @@
+\documentclass[handout]{beamer}
+
+\usetheme{Copenhagen}
+\useoutertheme{infolines}
+\usefonttheme[onlymath]{serif}
+
+\title{Overview of GAN}
+\author{Heng-Da Xu}
+\date{Oct 27, 2018}
+
+\linespread{1.2}
+\AtBeginSection{\frame{\sectionpage}}
+\AtBeginSubsection{\frame{
+	\frametitle{Outline}
+	\tableofcontents[currentsubsection]
+}}
+
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+	\tableofcontents
+\end{frame}
+
+\section{Introducton of GAN}
+
+\subsection{Basic idea of GAN}
+
+\begin{frame}[<+->]{What is GAN?}
+	\begin{itemize}
+		\item GAN is the abbr for \textbf{Generative Adversarial Network}.
+		\item GAN is a network framework for \textbf{generation}.
+		\item GAN consists of two parts: \textbf{Generator} ans \textbf{Discriminator}.
+	\end{itemize}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.6\textwidth]{images/gan.png}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{Generator}
+	\begin{itemize}
+		\item Image generation
+	\end{itemize}
+	\begin{actionenv}<.->
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.8\textwidth]{images/image-gene.png}
+		\end{figure}
+	\end{actionenv}
+	\begin{itemize}
+		\item Sentence generation
+	\end{itemize}
+	\begin{actionenv}<.->
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.8\textwidth]{images/sent-gene.png}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{Discriminator}
+	\begin{itemize}
+		\item Discriminator gives \textbf{real} data \textbf{high} score, \textbf{fake} data \textbf{low} score.
+	\end{itemize}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.8\textwidth]{images/discriminator.png}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{How to train GAN?}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.9\textwidth]{images/gan-v1.png}
+		\end{figure}
+	\end{actionenv}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.9\textwidth]{images/gan-v2.png}
+		\end{figure}
+	\end{actionenv}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.9\textwidth]{images/gan-v3.png}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}{Anime Face Generation}
+	\begin{itemize}
+		\begin{overprint}
+			\onslide<1 |handout:0> \item Iterate 100 times.
+			\onslide<2 |handout:0> \item Iterate 1000 times.
+			\onslide<3 |handout:0> \item Iterate 2000 times.
+			\onslide<4 |handout:0> \item Iterate 5000 times.
+			\onslide<5 |handout:0> \item Iterate 10000 times.
+			\onslide<6 |handout:0> \item Iterate 20000 times.
+			\onslide<7 |handout:1> \item Iterate 50000 times.
+		\end{overprint}
+	\end{itemize}
+	\begin{figure}
+		\centering
+		\includegraphics<1- |handout:0>[width=0.5\textwidth]{images/anime-1.png}%
+		\llap{\includegraphics<2- |handout:0>[width=0.5\textwidth]{images/anime-2.png}}%
+		\llap{\includegraphics<3- |handout:0>[width=0.5\textwidth]{images/anime-3.png}}%
+		\llap{\includegraphics<4- |handout:0>[width=0.5\textwidth]{images/anime-4.png}}%
+		\llap{\includegraphics<5- |handout:0>[width=0.5\textwidth]{images/anime-5.png}}%
+		\llap{\includegraphics<6- |handout:0>[width=0.5\textwidth]{images/anime-6.png}}%
+		\llap{\includegraphics<7- |handout:1>[width=0.5\textwidth]{images/anime-7.png}}
+	\end{figure}
+\end{frame}
+
+\subsection{Theory behind GAN}
+
+\begin{frame}[<+->]{What is GAN Exactly?}
+	\begin{itemize}
+		\item Generater: \(z \sim p_z(z)\), \(G(z) \to x\).
+		\item Discriminator: \(D(x) \to s\).
+		\item For real $x$, $D(x) \to 1$; for fake $x$, $D(x) \to 0$.
+		\item \(G(z)\) tries to generate data \textbf{similar} to real data.
+		\item \(D(x)\) tries to distinguish whether a data is \textbf{fake} or \textbf{real}.
+		\item \(G(z)\) implies a distrubution $p_g$, while we have a data distrubution $p_{d}$.
+		\item \(G(z)\) aims to make \(p_g\) as \textbf{close} as to \(p_{d}\).
+		\item \(D(x)\) aims to \textbf{distinguish} data from \(p_g\) or \(p_{d}\).
+		\item A \textbf{good} generative distrubution $p_g$ is what we want.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{Objective function}
+	\begin{itemize}
+		\item We will train $G$ and $D$.
+		\item \(D\) wants to make \(D(x)\) high and \(D(G(z))\) low.
+		\item \(G\) wants to make \(D(G(z))\) high.
+		\item The objective function for $D$
+			$$\max V(G, D) = \max \mathbb{E}_{x \sim p_{d}(x)}[\log D(x)] + \mathbb{E}_{z \sim p_z(z)}[\log (1 - D(G(z)))]$$
+			$$\max V(G, D) = \max \mathbb{E}_{x \sim p_{d}(x)}[\log D(x)] + \mathbb{E}_{x \sim p_g(x)}[\log (1 - D(x)]$$
+		\item The objective function for $G$
+			$$\min V(G, D) = \min \mathbb{E}_{x \sim p_g(x)}[\log (1 - D(x)]$$
+		\item The final objective function
+			$$\min_G \max_D V(G,D) = \mathbb{E}_{x \sim p_{d}(x)}[\log D(x)] + \mathbb{E}_{x \sim p_g(x)}[\log (1 - D(x))]$$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{Training}
+	\begin{itemize}
+		\item Initialize parameter $\theta_d$ for $D$ and $\theta_g$ for $G$
+		\item For each training iteration:
+			\begin{itemize}
+				\item Sample $m$ examples ${x^1, x^2, \dots, x^m}$ from database
+				\item Sample $m$ noise samples ${z^1, z^2, \dots, z^m}$ from a distribution
+				\item Obtaining generated data ${\hat{x}^1, \hat{x}^2, \dots, \hat{x}^m}$
+				\item Gradient ascent to maximize \\
+					$V = \frac{1}{m}\sum_{i=1}^{m}\log D(x^i) + \frac{1}{m}\sum_{i=1}^{m}\log (1 - D(\hat{x}^i)))$ \\
+					$\theta_d = \theta_d + \nabla V(\theta_d)$
+				\item Sample $m$ noise samples ${z^1, z^2, \dots, z^m}$ from a distribution
+				\item Gradient descent to minimize \\
+				$V = + \frac{1}{m}\sum_{i=1}^{m}\log (1 - D(G(\hat{z}^i))))$ \\
+				$\theta_g = \theta_g - \nabla V(\theta_g)$
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{Optimal $D$}
+	\begin{actionenv}
+		\begin{align*}
+			\max_D V(D, G) &= \mathbb{E}_{x \sim p_{data}(x)}[\log D(x)] + \mathbb{E}_{x \sim p_g(x)}[\log (1 - D(x))] \\
+			\uncover<+->{&= \int_x p_{data}(x) \log(D(x)) dx + \int_x p_g(x) \log(1-D(x)) dx \\}
+			\uncover<+->{&= \int_x p_{data}(x) \log(D(x)) + p_g(x) \log(1-D(x)) dx}
+		\end{align*}
+	\end{actionenv}
+	\begin{itemize}
+		\item Let $p_{data}(x) = a$, $p_g(x)=b$, $D(x)=D$
+	\end{itemize}
+
+	\begin{actionenv}
+		$$f(D) = a\log D + b \log (1-D)$$
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{Optimal $D$ (2)}
+	\begin{actionenv}
+		$$f(D) = a\log D + b \log (1-D)$$
+	\end{actionenv}
+	\begin{actionenv}
+		$$\frac{\partial f(D)}{\partial D} = \frac{a}{D} - \frac{b}{1-D}$$
+	\end{actionenv}
+	\begin{actionenv}
+		$$\frac{a}{D^*} - \frac{b}{1-D^*} = 0$$
+	\end{actionenv}
+	\begin{actionenv}
+		$$a-aD^*=bD^*$$
+	\end{actionenv}
+	\begin{actionenv}
+		$$D^*=\frac{a}{a+b}$$
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{Optimal $G$}
+	\begin{actionenv}
+		$$D^*(x) = \frac{p_{d}(x)}{p_{d}(x) + p_g(x)}$$
+	\end{actionenv}
+	\begin{align*}
+		\uncover<+->{&\ \ \ \ \min_G \max_D V(G, D) = \min_G V(G, D^*) \\}
+		\uncover<+->{&= \mathbb{E}_{x \sim p_{data}(x)}[\log D^*(x)] + \mathbb{E}_{x \sim p_g(x)}[\log (1 - D^*(x))] \\}
+		\uncover<+->{&= \int_x p_{d}(x) \log(D^*(x)) dx + \int_x p_g(x) \log(1-D^*(x)) dx\\}
+		\uncover<+->{&= \int_x p_{d}(x) \log\bigg(\frac{p_{d}(x)}{p_{d}(x) + p_g(x)}\bigg) + p_g(x) \log\bigg(1-\frac{p_{d}(x)}{p_{d}(x) + p_g(x)}\bigg) dx}
+	\end{align*}
+\end{frame}
+
+\begin{frame}[<+->]{$G$: Minimize JS-Divergence}
+	\begin{align*}
+		\uncover<+->{&= \int_x p_{d}(x) \log\frac{p_{d}(x)}{p_{d}(x) + p_g(x)} + p_g(x) \log\frac{p_{g}(x)}{p_{d}(x) + p_g(x)} dx \\ \\}
+		\uncover<+->{&= \int_x p_{d}(x) \log\frac{p_{d}(x) / 2}{(p_{d}(x) + p_g(x))/2} + p_g(x) \log\frac{p_{g}(x)/2}{(p_{d}(x) + p_g(x))/2} dx \\ \\}
+		\uncover<+->{&= \min_G KL \Big ( p_{data} || \frac{p_{data} + p_g}{2} \Big) + KL \Big ( p_{g} || \frac{p_{data} + p_g}{2} \Big) + 2\log 2 \\ \\}
+		\uncover<+->{&= \min_G 2\log2 + 2 JS(p_{data} || p_g)}
+	\end{align*}
+\end{frame}
+
+\begin{frame}[<+->]{Nash Equilibrium}
+	\begin{itemize}
+		\item The training will stop at \textbf{Nash Equilibrium}
+			\footnote{Goodfellow et. al., Generative adversarial nets, NIPS 2014} (saddle point).
+		\item Train \(D\) several times, Train \(G\) one time.
+	\end{itemize}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.95\textwidth]{images/goodfellow-saddle-point.png}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\section{Evolution of GAN}
+
+\begin{frame}[<+->]{GAN ZOO}
+	\begin{itemize}
+		\item There are almost 500 GANs in the world.\footnote{https://deephunt.in/the-gan-zoo-79597dc8c347}
+		\item ACGAN, BGAN, CGAN, DCGAN, EBGAN, fGAN, GoGAN, ...
+	\end{itemize}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.65\textwidth]{images/gan-zoo.jpg}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\subsection{LSGAN: Least Squares GAN}
+
+\begin{frame}[<+->]{LSGAN: Least Squares GAN (ICCV 2017 \footnote{Mao, Xudong, et al. Least squares generative adversarial networks ICCV 2017})}
+	\begin{itemize}
+		\item Object function of GAN
+		$$\max_D V(D, G) = \mathbb{E}_{x \sim p_{d}(x)}[\log D(x)] + \mathbb{E}_{x \sim p_g(x)}[\log (1 - D(x))]$$
+	\end{itemize}
+	\begin{itemize}
+		\item \(D\) has a classifier with the \textbf{sigmoid cross entropy} loss function (Classification).
+		\item \textbf{Gradients vanish}: The gradients is quite small when the generated samples are so bad firstly.
+		\item LSGAN adopt the \textbf{least squares} loss function for \(D\). (Regression)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{LSGAN: Formulation}
+	\begin{itemize}
+		\item \(D\) gives value \(a\) for fake data and value \(b\) for real data
+	\end{itemize}
+	\begin{actionenv}
+		$$\min_D V_{LSGAN}(D) = \frac{1}{2} \mathbb{E}_{x \sim p_{data}(x)}[(D(x)-b)^2] +  \frac{1}{2} \mathbb{E}_{z \sim p_z(z)}[(D(G(z)-a)^2]$$
+	\end{actionenv}
+	\begin{itemize}
+		\item \(c\) denotes the value that \(G\) wants \(D\) to believe for fake data
+	\end{itemize}
+	\begin{actionenv}
+		$$\min_G V_{LSGAN}(G) = \frac{1}{2} \mathbb{E}_{z \sim p_z(z)}[(D(G(z)-c)^2]$$		
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{LSGAN: Loss Function}
+	\begin{itemize}
+		\item Loss function of \(D\)
+		$$\min_D V_{LSGAN}(D) = \frac{1}{2} \mathbb{E}_{x \sim p_{d}(x)}[(D(x)-b)^2] +  \mathbb{E}_{z \sim p_z(z)}[(D(G(z)-a)^2]$$
+	\end{itemize}
+	\begin{itemize}
+		\item Derive the optimal \(D\) for a fixed \(G\)
+		$$D^*(x) = \frac{b p_{d}(x)+a p_g(x)}{p_{d}(x)+p_g(x)}$$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{LSGAN: optimal $D$}
+	\begin{itemize}
+		\item Loss function of \(G\) given the optimal \(D^*\)
+	\end{itemize}
+	\begin{actionenv}
+		\ \ \ \ $\min V_{LSGAN}(G)$
+	\end{actionenv}
+	\begin{align*}
+		\uncover<+->{&= \mathbb{E}_{z \sim p_z(z)}[(D^*(G(z)-c)^2] \\ \\}
+		\uncover<+->{&= \frac{1}{2} \mathbb{E}_{x \sim p_{data}(x)}[(D^*(x)-c)^2] + \frac{1}{2} \mathbb{E}_{z \sim p_z(z)}[(D^*(G(z)-c)^2] \\ \\}
+		\uncover<+->{&= \frac{1}{2} \int_x \frac{((b-c)(p_d(x) + p_g(x)) - (b-a)p_g(x))^2}{p_d(x) + p_g(x)} dx}
+	\end{align*}
+\end{frame}
+
+\begin{frame}[<+->]{LSGAN: Pearson $\chi^2$ Divergence}
+	\begin{itemize}
+		\item If we set $b-c=1$ and $b-a=2$, then
+	\end{itemize}
+	\begin{align*}
+		\uncover<+->{\min_G V_{LSGAN}(G) &= \frac{1}{2} \int_x \frac{(p_d(x) - p_g(x))^2}{p_d(x) + p_g(x)} dx \\ \\}
+		\uncover<+->{& = \frac{1}{2} \chi^2_{Pearson}(p_d+p_g||2p_g)}
+	\end{align*}
+	\begin{itemize}
+		\item Minimizing the objective function of LSGAN yields minimizing the Pearson $\chi^2$ divergence
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{LSGAN: Hyperparameters Setting}
+	\begin{itemize}
+		\item Setting \(a = -1\), \(b = 1\), and \(c = 0\)
+	\end{itemize}
+	\begin{align*}
+		\uncover<+->{\min_D V_{LSGAN}(D) &= \frac{1}{2} \mathbb{E}_{x \sim p_{d}(x)}[(D(x)-1)^2] + \frac{1}{2} \mathbb{E}_{z \sim p_z(z)}[(D(G(z)+1)^2] \\}
+		\uncover<+->{\min_G V_{LSGAN}(G) &= \frac{1}{2} \mathbb{E}_{z \sim p_z(z)}[(D(G(z))^2]}
+	\end{align*}
+	\begin{itemize}
+		\item LSGANs perform more stable during the learning process
+		\item LSGANs are able to generate higher quality images than regular GANs
+	\end{itemize}
+\end{frame}
+
+\subsection{WGAN: Wasserstein GAN}
+
+\begin{frame}[<+->]{WGAN: Wasserstein GAN \footnote{Arjovsky et. al., Wasserstein gan, arXiv 2017}}
+	\begin{itemize}
+		\item In vanilla GAN, $V(G, D^*)$ measures the JS-Divergence between $p_d$ and $p_g$.
+		\item However, in most case $p_d$ and $p_g$ are not overlaped.
+		\item Both $p_d$ and $p_g$ are low-dim manifold in high-dim space, their overlap can be ignored.
+	\end{itemize}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.4\textwidth]{images/wgan-overlap.png}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{WGAN: JS-Divergence Alawys Gives $\log 2$}
+	\begin{actionenv}
+		\begin{align*}
+			&\ \ \ \ JS(p_g, p_d) \\
+			&= KL\big(p_g || \frac{p_g + p_d}{2}\big) + KL\big(p_d || \frac{p_g + p_d}{2}\big) \\
+			\uncover<+->{&= \int_x p_g(x) \log \frac{p_g(x)}{(p_g(x) + p_d(x)) / 2} + p_g(x) \log \frac{p_d(x)}{(p_g(x) + p_d(x)) / 2} dx}
+		\end{align*}
+	\end{actionenv}
+	\begin{itemize}
+		\item When $p_g(x) \neq 0$ and $p_d(x) = 0$ or otherwise for almost every $x$
+	\end{itemize}
+	\begin{actionenv}
+		$$JS(p_g, p_d) = \int_x p(x) \log 2 dx = \log 2$$
+	\end{actionenv}
+	\begin{itemize}
+		\item So we cannot train $D$ too badly neither too well. It's difficult.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{WGAN: New Divergence - Earth Mover’s Distance}
+	\begin{itemize}
+		\item Considering one distribution P as a pile of earth, and another distribution Q as the target.
+		\item The average distance the earth mover has to move the earth.
+	\end{itemize}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.8\textwidth]{images/wgan-em.png}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{WGAN: Earth Mover’s Distance or Wasserstein Distance}
+	\begin{definition}
+		Wasserstein Distance of distribution $\mathbb{P}_d$ and $\mathbb{P}_g$
+		$$W(\mathbb{P}_d, \mathbb{P}_g) = \inf_{\gamma \in \prod(\mathbb{P}_d, \mathbb{P}_g)}
+		\mathbb{E}_{(x, y) \in \gamma}[||x - y||]$$
+		\begin{itemize}
+			\item $\prod(\mathbb{P}_d, \mathbb{P}_g)$ denotes the set of all joint distributions of $\mathbb{P}_d$ and $\mathbb{P}_g$.
+			\item $\gamma(x, y)$ indicates how much mass must be transported from $x$ to $y$ in order to transform the distributions $\mathbb{P}_d$ into the distribution $\mathbb{P}_g$
+			\item The EM distance then is the “cost” of the optimal transport plan
+		\end{itemize}
+	\end{definition}
+\end{frame}
+
+\begin{frame}{WGAN: There Are Many Moving Plans}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.85\textwidth]{images/wgan-em-1.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{WGAN: The Best Plan}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.85\textwidth]{images/wgan-em-2.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{WGAN: The Best Plan (2)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\textwidth]{images/wgan-em-3.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{WGAN: JS Divergence VS. Wasserstein Divergence}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.85\textwidth]{images/wgan-em-4.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[<+->]{WGAN: Kantorovich-Rubinstein Duality}
+	\begin{itemize}
+		\item The infimum is highly intractable. We get the \textbf{ Kantorovich-Rubinstein duality}.
+	\end{itemize}
+	\begin{actionenv}
+		$$W(\mathbb{P}_d, \mathbb{P}_g) = \sup_{||f||_L \leqslant 1} \mathbb{E}_{x \sim \mathbb{P}_d}[f(x)] - \mathbb{E}_{x \sim \mathbb{P}_g}[f(x)]$$
+	\end{actionenv}
+	\begin{itemize}
+		\item where the supremum is over all the \textbf{1-Lipschitz} functions
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{WGAN: K-Lipschitz}
+	\begin{definition}
+		Function $f$ is a K-Lipschitz function iif. there is a constant $K$ for every $x_1$ and $x_2$
+		$$|f(x_1) - f(x_2)| \leqslant K|x_1 - x_2|$$
+	\end{definition}
+	\begin{itemize}
+		\item We use a \textbf{Neural Network} parameterized $w$ to express function $f$.
+		\item \textbf{Weight clipping} $w$ in $[-c, c]$ to satisfy the K-Lipschitz constriction.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{WGAN: Final Formula of Wasserstein Distance}
+	\begin{itemize}
+		\item The generater $G(z)$ whose distribution is $\mathbb{P}_g$, so we get the finial formula of Wasserstein Distance
+	\end{itemize}
+	\begin{actionenv}
+		$$\max_{w \in W} \mathbb{E}_{x \sim \mathbb{P}_d}[f_w(x)] - \mathbb{E}_{z \sim p_z}[f_w(g_\theta(z))]$$
+	\end{actionenv}
+	 \begin{itemize}
+		 \item Function (NN) $f_w$ is the discriminator $D$.
+	 \end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{WGAN: Summary}
+	\begin{itemize}
+		\item Remove sigmoid in the last layer (regression not classification)
+		\item Remove the log on discriminator $D$
+		\item Weight clipping $w$ in $[-c, c]$
+		\item Use \texttt{RMSProp} rather than \texttt{Adam} to optimize (Trick)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{WGAN: Algotithm}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{images/wgan-alg.png}
+	\end{figure}
+\end{frame}
+
+\subsection{WGAN-GP: WGAN with Gradient Penalty}
+
+\begin{frame}[<+->]{WGAN-GP: WGAN with Gradient Penalty (NIPS 2017) \footnote{Gulrajani, Ishaan, et al, Improved training of wasserstein gans, NIPS 2017}}
+	\begin{itemize}
+		\item Weight clipping make gradient either grows or decays exponentially.
+		\item Weights go to the threshold value. 
+	\end{itemize}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.8\textwidth]{images/wgan-gp.png}
+		\end{figure}
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}[<+->]{WGAN-GP: Gradient Penalty}
+	\begin{itemize}
+		\item A function is 1-Lipschtiz iif. it has gradients with norm at most 1 everywhere
+		\item so we consider directly constraining the gradient norm of $D$.
+	\end{itemize}
+	\begin{actionenv}
+		$$L = \mathbb{E}_{x \sim \mathbb{P}_g}[D(x)] - \mathbb{E}_{x \sim \mathbb{P}_d}[D(x)] + \lambda \mathbb{E}_{x \sim \chi^2}[(||\nabla D(x)||_2 - 1)^2]$$
+	\end{actionenv}
+	\begin{itemize}
+		\item We sample uniformly along straight lines between pairs of points from $\mathbb{P}_g$ and $\mathbb{P}_g$, which defines a distrubution $\mathbb{P}_{p}$.
+	\end{itemize}
+	\begin{actionenv}
+		$$L = \mathbb{E}_{x \sim \mathbb{P}_g}[D(x)] - \mathbb{E}_{x \sim \mathbb{P}_d}[D(x)] + \lambda \mathbb{E}_{x \sim \mathbb{P}_{p}}[(||\nabla D(x)||_2 - 1)^2]$$
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}{WGAN-GP: Sample On The Line}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\textwidth]{images/wgan-gp-2.png}
+	\end{figure}
+\end{frame}
+
+% \subsection{f-GAN: f-Divergence}
+
+% \begin{frame}[<+->]{f-GAN: Different GANs Have Different Divergence}
+% 	\begin{itemize}
+% 		\item Vanila GAN: JS-Divergence $$JS(p, q) = KL(p||\frac{p+q}{2}) + KL(q||\frac{p+q}{2})$$
+% 		\item LSGAN: Pearson $\chi^2$-Divergence $$\chi^2_{Pearson}(p,q) = \int_x \frac{(p - q)^2}{q} dx$$
+% 		\item WGAN: Wasserstein Divergence $$W(\mathbb{P}_d, \mathbb{P}_g) = \inf_{\gamma \in \prod(\mathbb{P}_d, \mathbb{P}_g)}
+% 		\mathbb{E}_{(x, y) \in \gamma}[||x - y||]$$
+% 	\end{itemize}
+% \end{frame}
+
+% \begin{frame}[<+->]{f-GAN: f-Divergence}
+% 	\begin{itemize}
+% 		\item Actually, any f-Divergence can be used to GAN
+% 	\end{itemize}
+% 	\begin{definition}
+% 		f-Divergence
+% 		$$D_f(p,q)=\int_\chi q(x) f\big( \frac{p(x)}{q(x)} \big) dx$$
+% 		where function $f: \mathbb{R}_+ \to \mathbb{R}$ is a convex, lower-semicontinuous function satisfying $f(1)=0$
+% 	\end{definition}
+% \end{frame}
+
+% \begin{frame}[<+->]{f-GAN: Different $f$ Derive Different Divergence}
+% 	\begin{itemize}
+% 		\item KL Divergence: $f(x)=x\log x$
+% 			$$D_f(P||Q) = \int_x q(x) \frac{p(x)}{q(x)} \log \frac{p(x)}{q(x)} dx = \int_x p(x) \log \frac{p(x)}{q(x)} dx$$
+% 		\item Reverse KL Divergence: $f(x)=-\log x$
+% 			$$D_f(P||Q) = \int_x q(x) \Big( -\log \frac{p(x)}{q(x)} \Big) dx = \int_x q(x) \log \frac{q(x)}{p(x)} dx$$
+% 		\item Pearson $\chi^2$ Divergence: $f(x) = (x - 1)^2$
+% 			$$D_f(P||Q) = \int_x q(x) \Big( \frac{p(x)}{q(x)} - 1 \Big)^2 dx = \int_x \frac{(p(x) - q(x))^2}{q(x)} dx$$
+% 	\end{itemize}
+% \end{frame}
+
+% \begin{frame}[<+->]{f-GAN: Different Divergence to Different GAN}
+% 	\begin{definition}
+% 		Every such function $f$ has a Fenchel Conjugate $f^*$
+% 		$$f^* = \sup_{u \in dom_f}\{ut-f(u)\}$$
+% 		The pair $(f, f^*)$ is dual that $f^{**}=f$
+% 	\end{definition}
+% 	\begin{itemize}
+% 		\item General f-GAN
+% 			$$\min_G \max_D V(G, D) = \mathbb{E}_{x \sim p_d}[D(x)] - \mathbb{E}_{x \sim p_g}[f^*(D(x))]$$
+% 	\end{itemize}
+% \end{frame}
+
+% \begin{frame}{f-GAN: f-Divergence Table}
+% 	\begin{figure}
+% 		\centering
+% 		\includegraphics[width=\textwidth]{images/f-gan.png}
+% 	\end{figure}
+% \end{frame}
+
+\section{Variation of GAN}
+
+\subsection{CGAN: Text to Image}
+
+% \begin{frame}[<+->]{CGAN: Conditional GAN}
+% 	\begin{itemize}
+% 		\item feeding a label $y$ into the both the $G$ and $D$
+% 	\end{itemize}
+% 	\begin{actionenv}
+% 		$$\min_G \max_D V(G, D) = \mathbb{E}_{x \sim p_d}[\log D(x|y)] + \mathbb{E}_{z \sim p_z}[\log D(G(x|y)|y')]$$
+% 	\end{actionenv}
+% 	\begin{actionenv}
+% 		\begin{figure}
+% 			\centering
+% 			\includegraphics[width=0.45\textwidth]{images/cgan.png}
+% 		\end{figure}
+% 	\end{actionenv}
+% \end{frame}
+
+% \begin{frame}{CGAN: Experiment}
+% 	\begin{figure}
+% 		\centering
+% 		\includegraphics[width=0.85\textwidth]{images/cgan-2.png}
+% 	\end{figure}
+% \end{frame}
+
+\begin{frame}[<+->]{CGAN: Text to Image (ICML 2016) \footnote{Reed, Scott, et al, Generative Adversarial Text to Image Synthesis, ICML 2016}}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.9\textwidth]{images/gan-cls.png}
+		\end{figure}
+	\end{actionenv}
+	\begin{itemize}
+		\item real image, right text: high socore $s_r \leftarrow D(x, h)$
+		\item real image, wrong text: low socere $s_w \leftarrow D(x, \hat{h})$
+		\item fake image, right text: low socere $s_f \leftarrow D(\hat{x}, h)$
+	\end{itemize}
+	\begin{actionenv}
+		$$L = \log(s_r) + \frac{1}{2}(\log(1-s_w)+\log(1-s_f))$$
+	\end{actionenv}
+\end{frame}
+
+\begin{frame}{CGAN: Text to Image Experment (1)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.6\textwidth]{images/gan-cls-2.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{CGAN: Text to Image Experment (2)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{images/gan-cls-3.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{CGAN: Text to Image Experment (3)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{images/gan-cls-4.png}
+	\end{figure}
+\end{frame}
+
+\subsection{Cycle-GAN: Image to Image}
+
+\begin{frame}{Cycle-GAN: Image to Image (ICCV 2017) \footnote{Zhu, Jun-Yan, et al, Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks, ICCV 2017}}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{images/cycle-gan-1.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Cycle-GAN: Training Data: Unpaired Images}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.55\textwidth]{images/cycle-gan-2.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[<+->]{Cycle-GAN: Framework}
+	\begin{actionenv}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.9\textwidth]{images/cycle-gan-3.png}
+		\end{figure}
+	\end{actionenv}
+	\begin{itemize}
+		\item Adversarial loss for $D_X$ and $D_Y$ ($D_Y$ for example)
+			$$L_{GAN}(G, D_Y, X, Y) = \mathbb{E}_{y \sim p_y(y)}[\log D_Y(y)] + \mathbb{E}_{x \sim p_x(x)}[\log (1 - D_Y(G(x)))]$$
+		\item Cycle consistency loss
+			$$L_{cyc}(G, F) = \mathbb{E}_{x \sim p_x(x)}[||F(G(x)) - x||_1] + \mathbb{E}_{y \sim p_y(y)}[||F(G(y)) - y||_1]$$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[<+->]{Cycle-GAN: Full Objective}
+	\begin{itemize}
+		\item Full objective
+		\begin{align*}
+			L(G, F, D_X, D_Y) = &L_{GAN}(G, D_Y, X, Y) + \\ &L_{GAN}(F, D_X, Y, X) + \\ &\lambda L_{cyc}(G, F)
+		\end{align*}
+		\item Aim to solve
+		$$G^* F^* = \arg \min_{G, F} \max_{D_X, D_Y} L(G, F, D_X, D_Y)$$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Cycle-GAN: Image to Image Experiment (1)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{images/cycle-1-1.png}
+		\includegraphics[width=\textwidth]{images/cycle-1-2.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Cycle-GAN: Image to Image Experiment (2)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{images/cycle-2-1.png}
+		\includegraphics[width=\textwidth]{images/cycle-2-2.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Cycle-GAN: Image to Image Experiment (3)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{images/cycle-3-1.png}
+		\includegraphics[width=\textwidth]{images/cycle-3-2.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Cycle-GAN: Image to Image Experiment (5)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{images/cycle-0.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Cycle-GAN: Image to Image Experiment (6)}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.85\textwidth]{images/cycle-4.png}
+	\end{figure}
+\end{frame}
+
+% \subsection{InfoGAN}
+
+% \begin{frame}{InfoGAN (NIPS 2016)}
+% 	\begin{figure}
+% 		\centering
+% 		\includegraphics[width=0.9\textwidth]{images/infogan-1.png}
+% 	\end{figure}
+% \end{frame}
+
+% \begin{frame}[<+->]{InfoGAN: Latent Codes}
+% 	\begin{itemize}
+% 		\item Decompose the input noise vector into two parts $z$ and $c$
+% 		\item The generator becomes $G(z, c)$
+% 		\item $z$ is noise while $c$ implies some significative infomation
+% 		\item But the standard GAN trends to ignore $c$, then $P(x|c)$ becomes $P(x)$
+% 		\item there should be high mutual information between $c$ and $G(z, c)$, thus $I(c, G(z,c))$ should be high
+% 	\end{itemize}
+% \end{frame}
+
+% \begin{frame}[<+->]{InfoGAN: Mutual Information}
+% 	\begin{definition}
+% 		The mutual information between random variable $X$ and $Y$, $I(X, Y)$, measures the amount of information learned from $Y$ about $X$.
+% 		$$I(X, Y) = H(X) - H(X|Y) = H(Y) - H(Y|X)$$
+% 	\end{definition}
+% 	\begin{itemize}
+% 		\item $I(X, Y)$ is the reduction of uncertainty in $X$ when $Y$ is observed.
+% 		\item If $X$ and $Y$ are independent, then $I(X, Y) = 0$.
+% 	\end{itemize}
+% \end{frame}
+
+% \begin{frame}[<+->]{InfoGAN: Objective Function}
+% 	\begin{itemize}
+% 		\item Objective function with mutual information
+% 		$$\min_G \max_D V_I(D, G) = V(D, G) - \lambda I(c, G(z, c))$$
+% 	\end{itemize}
+% 	\begin{itemize}
+% 		\item Variational lower bound $L_I(G,Q)$, of the mutual information, $I(c, G(z, c))$
+% 		\begin{align*}
+% 			L_I(G,Q) &= \mathbb{E}_{c \sim P(c), x \sim G(z, c)}[\log Q(c|x)] + H(c) \\
+% 			&\leqslant I(c, G(z, c))
+% 		\end{align*}
+% 	\end{itemize}
+% 	\begin{itemize}
+% 		\item Objective function of InfoGAN
+% 		$$\min_G \max_D V_I(D, G) = V(D, G) - \lambda L_I(G, Q)$$
+% 	\end{itemize}
+% \end{frame}
+
+% \begin{frame}{InfoGAN: Addition}
+% 	\begin{figure}
+% 		\centering
+% 		\includegraphics[width=0.9\textwidth]{images/infogan-2.png}
+% 	\end{figure}
+% \end{frame}
+
+\section*{References}
+
+\begin{frame}[t, allowframebreaks]{References}
+	\nocite{*}
+	\bibliographystyle{plain}
+	\bibliography{gan}
+\end{frame}
+
+\end{document}
